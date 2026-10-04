@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Lunar Escape | Login</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@400;500;600&display=swap');
+
+/* ================= RESET ================= */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; min-height: 100%; }
+body {
+    font-family: 'Jost', 'Segoe UI', Arial, sans-serif;
+    background: #0d0907;
+    color: #f4ead8;
+}
+
+/* ================= LAYOUT + SEAMLESS PHOTO ================= */
+.split {
+    position: relative;
+    display: flex;
+    min-height: 100vh;
+    overflow: hidden;
+    background: #0d0907;
+}
+
+/* THE PHOTO  (palitan ang filename dito kung PNG ang gamit mo) */
+.split::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 84%;
+    background: url("image/login-bg.png") 40% center / cover no-repeat;
+    filter: brightness(.76) saturate(1.08) sepia(.2) contrast(1.06);
+    animation: settle 2.2s ease-out both;
+}
+@keyframes settle { from { transform: scale(1.07); } to { transform: scale(1); } }
+
+/* THE FADE: smooth na papunta sa kulay ng login side, walang visible na gilid */
+.split::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(to top, rgba(13,9,7,.85) 0%, rgba(13,9,7,.3) 34%, rgba(13,9,7,0) 58%),
+        linear-gradient(to bottom, rgba(13,9,7,.55) 0%, rgba(13,9,7,0) 22%),
+        linear-gradient(to right,
+            rgba(13,9,7,0) 0%, rgba(13,9,7,0) 34%,
+            rgba(13,9,7,.12) 44%, rgba(13,9,7,.35) 52%,
+            rgba(13,9,7,.62) 60%, rgba(13,9,7,.85) 68%,
+            rgba(13,9,7,.96) 75%, #0d0907 83%);
+}
+
+/* ---------- PHOTO SIDE (text) ---------- */
+.photo {
+    position: relative;
+    z-index: 1;
+    flex: 1.35;
+    min-height: 100vh;
+}
+
+.brand {
+    position: absolute;
+    top: 34px;
+    left: 48px;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 23px;
+    font-weight: 600;
+    letter-spacing: 5px;
+    color: #f7eddb;
+    text-shadow: 0 2px 14px rgba(0,0,0,.6);
+}
+.caption {
+    position: absolute;
+    left: 48px;
+    bottom: 56px;
+    max-width: 460px;
+}
+.caption h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(34px, 3.6vw, 52px);
+    font-weight: 500;
+    line-height: 1.08;
+    letter-spacing: -.3px;
+    color: #fbf1de;
+    margin-bottom: 14px;
+}
+.caption p { font-size: 15px; line-height: 1.6; color: #dccdb6; max-width: 380px; }
+
+/* ---------- LOGIN SIDE ---------- */
+.panel {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    min-width: 440px;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 48px clamp(32px, 5vw, 76px);
+}
+.panel-inner { width: 100%; max-width: 400px; margin: 0 auto; }
+
+.small-title { display: none; }
+
+.panel h1 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(38px, 3.8vw, 52px);
+    font-weight: 500;
+    line-height: 1.04;
+    letter-spacing: -.5px;
+    color: #f7eddb;
+    margin-bottom: 12px;
+}
+.subtitle { color: #a89d90; font-size: 14px; margin-bottom: 30px; }
+
+/* ================= ERROR ================= */
+.error-message {
+    display: none;
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 12px 14px;
+    border-left: 3px solid #d89b5c;
+    border-radius: 10px;
+    background: rgba(130,54,25,.25);
+    color: #efc399;
+    font-size: 12.5px;
+    line-height: 1.55;
+}
+.error-message.show { display: block; animation: errorAppear .35s ease; }
+@keyframes errorAppear {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ================= INPUTS (NEW DESIGN) ================= */
+.input-group { margin-bottom: 20px; }
+.input-group label {
+    display: block;
+    color: #b8ac9c;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: .4px;
+    margin-bottom: 9px;
+    text-transform: lowercase;
+}
+.input-group label::first-letter { text-transform: uppercase; }
+
+.input-group input {
+    width: 100%;
+    height: 54px;
+    padding: 0 16px 0 50px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.12);
+    background-color: rgba(255,255,255,.045);
+    background-repeat: no-repeat;
+    background-position: 17px center;
+    background-size: 20px 20px;
+    color: #f7eddb;
+    font-family: inherit;
+    font-size: 15px;
+    outline: none;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    transition: border-color .25s ease, background-color .25s ease, box-shadow .25s ease;
+}
+.input-group input::placeholder { color: #6f665d; }
+.input-group input:hover { border-color: rgba(255,255,255,.2); }
+.input-group input:focus {
+    border-color: #e0b46c;
+    background-color: rgba(224,180,108,.07);
+    box-shadow: 0 0 0 4px rgba(224,180,108,.13), 0 8px 24px rgba(0,0,0,.25);
+}
+.input-group input[type="password"]:not(:placeholder-shown) { letter-spacing: 3px; }
+
+/* icons: user + lock (gray, then gold when focused) */
+#username {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23857a6d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 20c1.5-4 5-5.5 8-5.5s6.5 1.5 8 5.5'/%3E%3C/svg%3E");
+}
+#username:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e0b46c' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 20c1.5-4 5-5.5 8-5.5s6.5 1.5 8 5.5'/%3E%3C/svg%3E");
+}
+#password {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23857a6d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='9' rx='2.5'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E");
+}
+#password:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e0b46c' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='9' rx='2.5'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E");
+}
+
+.input-group input:-webkit-autofill {
+    -webkit-text-fill-color: #f7eddb;
+    -webkit-box-shadow: 0 0 0 40px #1d1510 inset;
+    caret-color: #f7eddb;
+}
+
+.password-wrapper { position: relative; width: 100%; }
+.password-wrapper input { padding-right: 52px; }
+
+.password-toggle {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #8a8076;
+    cursor: pointer;
+    transition: color .2s ease, background .2s ease, transform .2s ease;
+}
+.password-toggle:hover { color: #e6bd78; background: rgba(255,255,255,.06); }
+.password-toggle:active { transform: translateY(-50%) scale(.92); }
+.password-toggle:focus-visible { outline: 2px solid #e0b46c; outline-offset: 2px; }
+.password-toggle svg { width: 20px; height: 20px; pointer-events: none; }
+
+/* ================= BUTTON ================= */
+.sign-in {
+    width: 100%;
+    height: 54px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(100deg, #f3d68c, #c98d45);
+    color: #2a1a0b;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    text-transform: lowercase;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(201,141,69,.20), inset 0 1px 0 rgba(255,255,255,.35);
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+.sign-in::first-letter { text-transform: uppercase; }
+.sign-in:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.06);
+    box-shadow: 0 14px 30px rgba(212,153,76,.30), inset 0 1px 0 rgba(255,255,255,.4);
+}
+.sign-in:active { transform: translateY(0); }
+.sign-in:focus-visible { outline: 2px solid #fff0c8; outline-offset: 3px; }
+
+/* ================= CREATE ACCOUNT ================= */
+.create-account {
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 1px solid rgba(255,255,255,.07);
+    color: #8f877e;
+    font-size: 13.5px;
+}
+.create-account a { color: #e6bd78; text-decoration: none; margin-left: 4px; font-weight: 500; }
+.create-account a:hover { color: #fff; }
+
+/* ================= TABLET / MOBILE ================= */
+@media (max-width: 900px) {
+    .split { flex-direction: column; }
+    .split::before { inset: 0 0 auto 0; width: 100%; height: 46vh; }
+    .split::after {
+        inset: 0 0 auto 0;
+        height: 46vh;
+        background:
+            linear-gradient(to top, #0d0907 0%, rgba(13,9,7,.8) 14%, rgba(13,9,7,.35) 32%, rgba(13,9,7,0) 55%),
+            linear-gradient(to bottom, rgba(13,9,7,.55) 0%, rgba(13,9,7,0) 28%);
+    }
+    .photo { flex: none; min-height: 0; height: 36vh; }
+    .brand { top: 22px; left: 24px; font-size: 17px; letter-spacing: 3px; }
+    .caption { left: 24px; right: 24px; bottom: 14px; }
+    .caption h2 { font-size: 28px; margin-bottom: 0; }
+    .caption p { display: none; }
+    .panel { max-width: none; min-width: 0; padding: 28px 24px 40px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .split::before { animation: none; }
+    * { transition-duration: .01ms !important; }
+}
+</style>
+</head>
+
+
+<body>
+
+<main class="split">
+
+    <!-- PHOTO SIDE (text only, photo is the background) -->
+    <section class="photo">
+        <div class="brand">THE LUNAR ESCAPE</div>
+
+        <div class="caption">
+            <h2>Where city lights<br>meet moonlit nights.</h2>
+            
+        </div>
+    </section>
+
+
+    <!-- LOGIN SIDE -->
+    <section class="panel">
+        <div class="panel-inner">
+
+            <div class="small-title">Lunar Escape</div>
+
+            <h1>
+                Welcome<br>
+                Lunar Escape
+            </h1>
+
+            <p class="subtitle">Sign in to continue your stay.</p>
+
+            <!-- ERROR -->
+            <div class="error-message" id="errorMessage">
+                The username or password you entered is incorrect.
+                Please verify your credentials and try again.
+            </div>
+
+            <!-- LOGIN FORM -->
+            <form action="login.php" method="POST" id="loginForm">
+
+                <!-- USERNAME -->
+                <div class="input-group">
+                    <label>USERNAME</label>
+                    <input type="text" name="username" id="username" placeholder="Enter username" required autocomplete="username">
+                </div>
+
+                <!-- PASSWORD -->
+                <div class="input-group">
+                    <label>PASSWORD</label>
+
+                    <div class="password-wrapper">
+                        <input type="password" name="password" id="password" placeholder="Enter password" required autocomplete="current-password">
+
+                        <button type="button" class="password-toggle" id="passwordToggle" aria-label="Show password">
+
+                            <!-- EYE WITH SLASH -->
+                            <svg id="eyeClosed" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 3L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M10.58 10.58C10.21 10.95 10 11.46 10 12C10 13.1 10.9 14 12 14C12.54 14 13.05 13.79 13.42 13.42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M9.88 5.08C10.57 4.9 11.28 4.8 12 4.8C17.5 4.8 21.5 9.2 22 12C21.78 13.25 21.02 14.58 19.87 15.78" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M6.61 6.61C4.61 8.05 3.35 10.13 3 12C3.5 14.8 7.5 19.2 13 19.2C14.17 19.2 15.29 18.99 16.32 18.62" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+
+                            <!-- NORMAL EYE -->
+                            <svg id="eyeOpen" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                                <path d="M2.5 12C2.5 12 6 5.5 12 5.5C18 5.5 21.5 12 21.5 12C21.5 12 18 18.5 12 18.5C6 18.5 2.5 12 2.5 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SIGN IN -->
+                <button type="submit" class="sign-in">SIGN IN</button>
+
+            </form>
+
+            <!-- CREATE ACCOUNT -->
+            <div class="create-account">
+                Don't have an account?
+                <a href="register.html">Create Account</a>
+            </div>
+
+        </div>
+    </section>
+
+</main>
+
+
+<script>
+
+/* ELEMENTS */
+const errorMessage = document.getElementById("errorMessage");
+const passwordInput = document.getElementById("password");
+const passwordToggle = document.getElementById("passwordToggle");
+const eyeClosed = document.getElementById("eyeClosed");
+const eyeOpen = document.getElementById("eyeOpen");
+
+/* CHECK LOGIN ERROR */
+const urlParams = new URLSearchParams(window.location.search);
+const error = urlParams.get("error");
+const dbError = urlParams.get("error") === "db";
+
+if (error === "1") {
+    errorMessage.classList.add("show");
+}
+
+/* DATABASE ERROR */
+if (dbError) {
+    errorMessage.textContent = "Unable to connect to the database. Please try again.";
+    errorMessage.classList.add("show");
+}
+
+/* PASSWORD SHOW / HIDE */
+passwordToggle.addEventListener("click", function () {
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        eyeClosed.style.display = "none";
+        eyeOpen.style.display = "block";
+        passwordToggle.setAttribute("aria-label", "Hide password");
+    } else {
+        passwordInput.type = "password";
+        eyeClosed.style.display = "block";
+        eyeOpen.style.display = "none";
+        passwordToggle.setAttribute("aria-label", "Show password");
+    }
+});
+
+/* REMOVE ERROR WHEN USER TYPES */
+document.querySelectorAll(".input-group input").forEach(function (input) {
+    input.addEventListener("input", function () {
+        errorMessage.classList.remove("show");
+    });
+});
+
+/* REMOVE ERROR FROM URL */
+if (error) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+}
+
+</script>
+
+</body>
+</html>
